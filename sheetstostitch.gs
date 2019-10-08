@@ -98,7 +98,7 @@ function push(){
     var firstrow = 2
     // last row minus 1 assuming the first row is headers
     var lastrow = range.getLastRow() + 1;
-    trackdoc(lastrow, tablename);
+    //trackdoc(lastrow, tablename);
 
     var i = batchSize + 1 ;
     Logger.log('starting "i" value : ' + batchSize)
@@ -137,14 +137,14 @@ function insertKeys(spreadsheetdata, keys, tablename, sheet, cid){
       record.table_name = tablename;
       record.key_names = keys;
       record.data = spreadsheetdata[i];
-      
+
       new_array.push(record);
       //Logger.log(record);
     }
     else {
       Logger.log("Skipping empty row at: " + i);
     }
-    
+
   }
   return new_array
 }
@@ -248,7 +248,7 @@ function roughSizeOfObject( object ) {
 }
 
 function trackdoc(lastrow, tablename) {
- var remote = SpreadsheetApp.openById('1f33oopWLMFGtuWQlLpUrpyeScMXnRd9cGSQxKuZ51B0');
+ var remote = SpreadsheetApp.openById('');
  var remote_sheet = remote.getSheets()[0];
  var cid = ScriptProperties.getProperty('STITCHID');
  var date = new Date();
