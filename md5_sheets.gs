@@ -1,4 +1,3 @@
-# Googlesheet Scripts
 //below is the script to paste into tools --> script editor in google sheets
 //in order to use the MD5 function to create a unique key
 
