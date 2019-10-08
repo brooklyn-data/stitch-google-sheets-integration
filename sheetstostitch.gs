@@ -407,8 +407,8 @@ function setStitchID(id) {
 }
 
 function getPrimaryKey(tableName) {
-  return ScriptProperties.getProperty(tableName);
+  return ScriptProperties.getProperty('PK_' + tableName);
 }
 function setPrimaryKey(tableName, key) {
-  ScriptProperties.setProperty(tableName, key);
+  ScriptProperties.setProperty('PK_' + tableName, key);
 }
