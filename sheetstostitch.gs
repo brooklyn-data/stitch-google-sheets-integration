@@ -86,7 +86,7 @@ function push(){
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var tablename = normalizeHeaders([sheet.getSheetName()])[0];
-  if (ScriptProperties.getProperty('STITCHTOKEN') == null || ScriptProperties.getProperty('STITCHID') == null || ScriptProperties.getProperty(tablename) == null){
+  if (getStitchToken() == null || getStitchID() == null || getPrimaryKey(tablename) == null){
     Browser.msgBox("You are missing some of the required information to send the data. Please click add the required information in the next prompt");
     onInstall();
   }
@@ -94,7 +94,7 @@ function push(){
     var range = sheet.getDataRange();
     var lastcolumn = range.getLastColumn();
     Logger.log(tablename);
-    var newkey = normalizeHeaders(ScriptProperties.getProperty(tablename).split(','));
+    var newkey = normalizeHeaders(getPrimaryKey(tablename).split(','));
     var firstrow = 2
     // last row minus 1 assuming the first row is headers
     var lastrow = range.getLastRow() + 1;
@@ -102,7 +102,7 @@ function push(){
 
     var i = batchSize + 1 ;
     Logger.log('starting "i" value : ' + batchSize)
-    if (ScriptProperties.getProperty('STITCHTOKEN') == null || ScriptProperties.getProperty('STITCHID') == null || tablename == null){
+    if (getStitchToken() == null || getStitchID() == null || tablename == null){
       msgBox("You are missing some of the required information to send the data. Please click the 'Set Up Spreadsheet for Push' in the dropdown");
     }
     else if (lastrow > i){
@@ -159,8 +159,8 @@ function largedoc(lastrow, lastcolumn, i, tablename, sheet, newkey){
     //Logger.log('rows ' + firstrow + " - " + (firstrow + 100000));
     var datarange = sheet.getRange(firstrow, 1, batchSize, lastcolumn);
     //Logger.log("datarange = " + datarange.getNumRows())
-    var api = ScriptProperties.getProperty('STITCHTOKEN');
-    var cid = ScriptProperties.getProperty('STITCHID');
+    var api = getStitchToken();
+    var cid = getStitchID();
     var spreadsheetdata = getRowsData(sheet, datarange, 1);
     var payload_pre = insertKeys(spreadsheetdata, newkey, tablename, sheet, cid, api);
     var payload = toTransit(payload_pre);
@@ -190,8 +190,8 @@ function smalldoc(lastrow, lastcolumn, i, firstrow, tablename, sheet, newkey){
   var length_left = lastrow - firstrow
   var datarange = sheet.getRange(firstrow, 1, length_left, lastcolumn);
   var spreadsheetdata = getRowsData(sheet, datarange, 1);
-  var api = ScriptProperties.getProperty('STITCHTOKEN');
-  var cid = ScriptProperties.getProperty('STITCHID');
+  var api = getStitchToken();
+  var cid = getStitchID();
   var spreadsheetdata = getRowsData(sheet, datarange, 1);
   var payload_pre = insertKeys(spreadsheetdata, newkey, tablename, sheet, cid, api);
   var payload = toTransit(payload_pre);
@@ -250,7 +250,7 @@ function roughSizeOfObject( object ) {
 function trackdoc(lastrow, tablename) {
  var remote = SpreadsheetApp.openById('');
  var remote_sheet = remote.getSheets()[0];
- var cid = ScriptProperties.getProperty('STITCHID');
+ var cid = getStitchID();
  var date = new Date();
  // Appends a new row with 3 columns to the bottom of the
  // spreadsheet containing the values in the array
@@ -263,9 +263,9 @@ function onInstall() {
   var key = Browser.inputBox("Input Stitch API token here. You can generate an API token by creating an Import API integration (see https://www.stitchdata.com/docs/integrations/import-api). Press cancel if no change.", Browser.Buttons.OK_CANCEL);
   var cid = Browser.inputBox("Input Stitch client ID here. Look at the URL on the Dashboard page – the client ID is the number between client and pipeline (https://app.stitchdata.com/client/XXXXXX/pipeline/connections). Press cancel if no change.", Browser.Buttons.OK_CANCEL);
   var primaryKey = Browser.inputBox("Enter a comma-separated list of the primary key(s) for this sheet (tab). Usually this will be one column, but if multiple columns make a row unique, add more. Press cancel if no change.", Browser.Buttons.OK_CANCEL);
-  if(key && key!="cancel") ScriptProperties.setProperty("STITCHTOKEN", key);
-  if(cid && cid!="cancel") ScriptProperties.setProperty("STITCHID", cid);
-  if(primaryKey && primaryKey!="cancel") ScriptProperties.setProperty(normalizeHeaders([sheet.getSheetName()]), primaryKey);
+  if(key && key!="cancel") setStitchToken(key);
+  if(cid && cid!="cancel") setStitchID(cid);
+  if(primaryKey && primaryKey!="cancel") setPrimaryKey(normalizeHeaders([sheet.getSheetName()]), primaryKey);
   auth()
 }
 
@@ -390,4 +390,25 @@ function isAlnum(char) {
 // Returns true if the character char is a digit, false otherwise.
 function isDigit(char) {
   return char >= '0' && char <= '9';
+}
+
+function getStitchToken() {
+  return ScriptProperties.getProperty('STITCHTOKEN');
+}
+function setStitchToken(token) {
+  ScriptProperties.setProperty('STITCHTOKEN', token);
+}
+
+function getStitchID() {
+  return ScriptProperties.getProperty('STITCHID');
+}
+function setStitchID(id) {
+  ScriptProperties.setProperty('STITCHID', id);
+}
+
+function getPrimaryKey(tableName) {
+  return ScriptProperties.getProperty(tableName);
+}
+function setPrimaryKey(tableName, key) {
+  ScriptProperties.setProperty(tableName, key);
 }
