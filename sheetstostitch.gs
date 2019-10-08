@@ -338,38 +338,21 @@ function normalizeHeaders(headers) {
   return keys;
 }
 
-// Normalizes a string, by removing all non-alphanumeric characters and using mixed case
-// to separate words. The output will always start with a lower case letter.
-// This function is designed to produce JavaScript object property names.
+// Normalizes a string by lower-casing it, removing all non-alphanumeric characters, and using underscores
+// to separate words.  If the first character ends up being a number it will be prefixed with an underscore.
+// This function is designed to produce valid table/column names.
 // Arguments:
 //   - header: string to normalize
 // Examples:
-//   "First Name" -> "firstName"
-//   "Market Cap (millions) -> "marketCapMillions
-//   "1 number at the beginning is ignored" -> "numberAtTheBeginningIsIgnored"
+//   "First Name" -> "first_name"
+//   "Market Cap (millions)" -> "market_cap_millions"
+//   "1 number at the beginning is prefixed" -> "_1_number_at_the_beginning_is_prefixed"
 function normalizeHeader(header) {
-  var key = "";
-  var upperCase = false;
-  for (var i = 0; i < header.length; ++i) {
-    var letter = header[i];
-    if (letter == " " && key.length > 0) {
-      upperCase = true;
-      continue;
-    }
-    if (!isAlnum(letter)){
-      continue;
-    }
-    if (key.length == 0 && isDigit(letter)) {
-      continue; // first character must be a letter
-    }
-    if (upperCase) {
-      upperCase = false;
-      key += letter.toUpperCase();
-    } else {
-      key += letter.toLowerCase();
-    }
+  var normalized = header.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  if (isDigit(normalized[0])) {
+    normalized = '_' + normalized;
   }
-  return key;
+  return normalized;
 }
 
 // Returns true if the cell where cellData was read from is empty.
