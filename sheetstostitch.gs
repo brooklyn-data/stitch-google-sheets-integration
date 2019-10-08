@@ -77,9 +77,9 @@ h("transit.extendToEQ",function(a,b){a.D=b.hashCode;a.C=b.equals;return a});h("t
 h("transit.readCache",function(){return new ua});h("transit.writeCache",function(){return new ta});})();
 
 var t = transit;
-var batchSize = 10000;
+var batchSize = 1000;
 
-// This function is what kicks off the datasync. It will either loop through and send 10000 records at a time,
+// This function is what kicks off the datasync. It will either loop through and send 1000 records at a time,
 // or send the entire dataset,depending on the size of the document
 
 function push(){
@@ -151,12 +151,12 @@ function insertKeys(spreadsheetdata, keys, tablename, sheet, cid){
 
 function largedoc(lastrow, lastcolumn, i, tablename, sheet, newkey){
   Logger.log('starting largedoc rows loop');
-  // this first row setting is so the first row gets incremented by 10000 at the beginning of the while loop instead of the end.
+  // this first row setting is so the first row gets incremented by 1000 at the beginning of the while loop instead of the end.
   var firstrow = (batchSize - 2)*-1;
-  // send 10000 rows at a time, asyncronosly.
+  // send 1000 rows at a time, asyncronosly.
   while (lastrow > i){
     firstrow = firstrow + batchSize
-    //Logger.log('rows ' + firstrow + " - " + (firstrow + 100000));
+    //Logger.log('rows ' + firstrow + " - " + (firstrow + batchSize));
     var datarange = sheet.getRange(firstrow, 1, batchSize, lastcolumn);
     //Logger.log("datarange = " + datarange.getNumRows())
     var api = getStitchToken();
@@ -183,7 +183,7 @@ function largedoc(lastrow, lastcolumn, i, tablename, sheet, newkey){
   smalldoc(lastrow, lastcolumn, i, firstrow, tablename, sheet, newkey)
 }
 
-// For sending the entire document, if less than 10000 rows, or for sending the remainder of a large document after the loop of 10000 records at a time.
+// For sending the entire document, if less than 1000 rows, or for sending the remainder of a large document after the loop of 1000 records at a time.
 function smalldoc(lastrow, lastcolumn, i, firstrow, tablename, sheet, newkey){
   Logger.log('starting last rows');
   //Logger.log('rows ' + firstrow + " - " + lastrow);
