@@ -393,17 +393,17 @@ function isDigit(char) {
 }
 
 function getStitchToken() {
-  return ScriptProperties.getProperty('STITCHTOKEN');
+  return ScriptProperties.getProperty('STITCH_TOKEN');
 }
 function setStitchToken(token) {
-  ScriptProperties.setProperty('STITCHTOKEN', token);
+  ScriptProperties.setProperty('STITCH_TOKEN', token);
 }
 
 function getStitchID() {
-  return ScriptProperties.getProperty('STITCHID');
+  return ScriptProperties.getProperty('STITCH_ID');
 }
 function setStitchID(id) {
-  ScriptProperties.setProperty('STITCHID', id);
+  ScriptProperties.setProperty('STITCH_ID', id);
 }
 
 function getPrimaryKey(tableName) {
