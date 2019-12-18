@@ -386,7 +386,7 @@ function normalizeHeaders(headers) {
 //   "Market Cap (millions)" -> "market_cap_millions"
 //   "1 number at the beginning is prefixed" -> "_1_number_at_the_beginning_is_prefixed"
 function normalizeHeader(header) {
-  var normalized = header.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  var normalized = header.toString().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
   if (isDigit(normalized[0])) {
     normalized = '_' + normalized;
   }
