@@ -85,10 +85,20 @@ var batchSize = 1000;
 function push(){
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var tablename = normalizeHeaders([sheet.getSheetName()])[0];
-  if (getStitchToken() == null || getStitchID() == null || getPrimaryKey(tablename) == null){
-    Browser.msgBox("You are missing some of the required information to send the data. Please click add the required information in the next prompt");
-    onInstall();
+  var tablename = getTableName(sheet);
+
+  if (!(getStitchID() && getStitchToken())) {
+    promptForStitchCredentials();
+  }
+  if (!getPrimaryKey(tablename)) {
+    promptForSheetPrimaryKey();
+  }
+
+  if (!(getStitchID() && getStitchToken())) {
+    Browser.msgBox("Stitch API credentials are required to send the data.");
+  }
+  else if (!getPrimaryKey(tablename)) {
+    Browser.msgBox("The primary key for this sheet is required to send the data.");
   }
   else {
     var range = sheet.getDataRange();
@@ -102,14 +112,12 @@ function push(){
 
     var i = batchSize + 1 ;
     Logger.log('starting "i" value : ' + batchSize)
-    if (getStitchToken() == null || getStitchID() == null || tablename == null){
-      msgBox("You are missing some of the required information to send the data. Please click the 'Set Up Spreadsheet for Push' in the dropdown");
-    }
-    else if (lastrow > i){
+    if (lastrow > i){
       largedoc(lastrow, lastcolumn, i, tablename, sheet, newkey)
 
     }
     else {smalldoc(lastrow, lastcolumn, i, firstrow, tablename, sheet, newkey)};
+    Browser.msgBox('Finished syncing sheet "' + sheet.getSheetName() + '" to table "' + tablename + '".');
   }
 }
 
@@ -257,16 +265,44 @@ function trackdoc(lastrow, tablename) {
  remote_sheet.appendRow([cid, lastrow, tablename, date ]);
 }
 
-function onInstall() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+function promptForStitchCredentials() {
+  var currentID = getStitchID();
+  var idPrompt = "Input Stitch client ID. Look at the URL on the Dashboard page – the client ID is the number between /client/ and /pipeline/ (https://app.stitchdata.com/client/XXXXXX/pipeline/connections).";
+  if (currentID) {
+    idPrompt += ' Press cancel to keep current Stitch client ID "' + currentID + '".';
+  }
+  var newID = Browser.inputBox(idPrompt, Browser.Buttons.OK_CANCEL);
+  if (newID != "cancel") {
+    setStitchID(newID);
+  }
+
+  var currentToken = getStitchToken();
+  var tokenPrompt = "Input Stitch API token. You can generate an API token by creating an Import API integration (see https://www.stitchdata.com/docs/integrations/import-api).";
+  if (currentToken) {
+    tokenPrompt += ' Press cancel to keep current Stitch API token "' + currentToken + '".';
+  }
+  var newToken = Browser.inputBox(tokenPrompt, Browser.Buttons.OK_CANCEL);
+  if (newToken != "cancel") {
+    setStitchToken(newToken);
+  }
+}
+
+function promptForSheetPrimaryKey() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var key = Browser.inputBox("Input Stitch API token here. You can generate an API token by creating an Import API integration (see https://www.stitchdata.com/docs/integrations/import-api). Press cancel if no change.", Browser.Buttons.OK_CANCEL);
-  var cid = Browser.inputBox("Input Stitch client ID here. Look at the URL on the Dashboard page – the client ID is the number between client and pipeline (https://app.stitchdata.com/client/XXXXXX/pipeline/connections). Press cancel if no change.", Browser.Buttons.OK_CANCEL);
-  var primaryKey = Browser.inputBox("Enter a comma-separated list of the primary key(s) for this sheet (tab). Usually this will be one column, but if multiple columns make a row unique, add more. Press cancel if no change.", Browser.Buttons.OK_CANCEL);
-  if(key && key!="cancel") setStitchToken(key);
-  if(cid && cid!="cancel") setStitchID(cid);
-  if(primaryKey && primaryKey!="cancel") setPrimaryKey(normalizeHeaders([sheet.getSheetName()]), primaryKey);
-  auth()
+  var tableName = getTableName(sheet);
+  var currentPK = getPrimaryKey(tableName);
+  var pkPrompt = "Enter a comma-separated list of the primary key(s) for this sheet (tab). Usually this will be one column, but if multiple columns make a row unique, add more.";
+  if (currentPK) {
+    pkPrompt += ' Press cancel to keep current primary key(s) "' + currentPK + '".';
+  }
+  var newPK = Browser.inputBox(pkPrompt, Browser.Buttons.OK_CANCEL);
+  if (newPK != "cancel") {
+    setPrimaryKey(tableName, newPK);
+  }
+}
+
+function onInstall() {
+  onOpen()
 }
 
 function auth() {}
@@ -274,8 +310,10 @@ function auth() {}
 function onOpen() {
   var spreadsheet = SpreadsheetApp.getActive();
   var menuItems = [
-    {name: 'Sync with Stitch', functionName: 'push'},
-    {name: 'Set Up Spreadsheet for Push', functionName: 'onInstall'}
+    {name: 'Sync this sheet to Stitch', functionName: 'push'},
+    null,  // line separator
+    {name: "Set this sheet's primary key", functionName: 'promptForSheetPrimaryKey'},
+    {name: 'Set Stitch API credentials', functionName: 'promptForStitchCredentials'}
   ];
   spreadsheet.addMenu('Stitch Import', menuItems);
   function auth() {}
@@ -387,6 +425,10 @@ function getStitchID() {
 }
 function setStitchID(id) {
   ScriptProperties.setProperty('STITCH_ID', id);
+}
+
+function getTableName(sheet) {
+  return normalizeHeader(sheet.getSheetName());
 }
 
 function getPrimaryKey(tableName) {
