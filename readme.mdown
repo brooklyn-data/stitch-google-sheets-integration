@@ -15,7 +15,7 @@ You should make sure to set the columns to the correct data formats. For example
 1. Open the spreadsheet you would like to push to Stitch.
 2. Click Tools, Script Editor. Click Close on the Popup, or choose blank project.
 3. Delete the contents of the file currently open
-4. Copy the contents from this folders's [sheetstostitch.gs](https://github.com/stitchdata/google-sheets-integration/blob/master/sheetstostitch.gs) page, and paste into the 'code.gs' script file you have open.
+4. Copy the contents from this folders's [sheetstostitch.gs](sheetstostitch.gs) page, and paste into the 'code.gs' script file you have open.
 5. Go back to the spreadsheet and refresh the page. If you don't see a new dropdown in the toolbar titled "Stitch Import", close the spreadsheet and re-open it.
 6. In the "Stitch Import" dropdown, click "Setup Spreadsheet for Push". You'll need to authorize the script to access the data, so log in with the Google account that has access to this sheet.
 7. Enter API key and Client ID provided in your Stitch account.
