@@ -14,13 +14,14 @@ You should make sure to set the columns to the correct data formats. For example
 
 1. Open the spreadsheet you would like to sync to Stitch.
 2. Click Tools, Script Editor. Click Close on the Popup, or choose blank project.
-3. Delete the contents of the file currently open
-4. Copy the contents from this folders's [sheetstostitch.gs](sheetstostitch.gs) page, and paste into the 'code.gs' script file you have open.
-5. Go back to the spreadsheet and refresh the page. If you don't see a new dropdown in the toolbar titled "Stitch Import", close the spreadsheet and re-open it.
-6. In the "Stitch Import" dropdown, click "Set Stitch API credentials". You'll need to authorize the script to access the data, so log in with the Google account that has access to this sheet.
-7. Enter API key and Client ID provided in your Stitch account.
-8. In the "Stitch Import" dropdown, click "Set this sheet's primary key".
-9. Choose which columns act as the unique key for your table. These columns must be unique for all current and future rows of this table. If you have multiple columns that make up the unique key, it's recommended that you hash them together using the [md5 Google Sheets function](md5_sheets.gs).
+3. In the "Run" menu, click "Disable new Apps Script runtime powered by V8".
+4. Delete the contents of the file currently open
+5. Copy the contents from this folders's [sheetstostitch.gs](sheetstostitch.gs) page, and paste into the 'code.gs' script file you have open.
+6. Go back to the spreadsheet and refresh the page. If you don't see a new dropdown in the toolbar titled "Stitch Import", close the spreadsheet and re-open it.
+7. In the "Stitch Import" dropdown, click "Set Stitch API credentials". You'll need to authorize the script to access the data, so log in with the Google account that has access to this sheet.
+8. Enter API key and Client ID provided in your Stitch account.
+9. In the "Stitch Import" dropdown, click "Set this sheet's primary key".
+10. Choose which columns act as the unique key for your table. These columns must be unique for all current and future rows of this table. If you have multiple columns that make up the unique key, it's recommended that you hash them together using the [md5 Google Sheets function](md5_sheets.gs).
 
     ### More on using the md5 function
     To use this handy function in Google Sheets, enter the contents of the [md5_sheets.gs file](md5_sheets.gs) into Tools --> Script Editor. Then, to create a unique key in your sheet based on multiple columns, create an 'ID' column and in its cells enter " =md5(cell1&cell2&cellN) " where cells 1,2...N are the cells that make up your unique key. Make sure to format numbers or dates as text before using them in an md5 function to ensure the data being used to generate your unique key are in a specified format. If you plan to join this table to other data models based on this key, make sure the output matches what your warehouse generates from "select md5('cell1 contents' || 'cell2 contents' || 'cellN contents')". For more information on the function and its uses, check [here](https://blog.fishtownanalytics.com/the-most-underutilized-function-in-sql-9279b536ed1a) and [here](https://en.wikipedia.org/wiki/MD5).
